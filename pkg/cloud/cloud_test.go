@@ -27,8 +27,8 @@ var (
 
 func TestCreateAccessPoint(t *testing.T) {
 	var (
-		arn                  = "arn:aws:elasticfilesystem:us-east-1:1234567890:access-point/fsap-abcd1234xyz987"
-		accessPointId        = "fsap-abcd1234xyz987"
+		arn                  = "arn:aws:elasticfilesystem:us-east-1:1234567890:access-point/fsap-abcd1234"
+		accessPointId        = "fsap-abcd1234"
 		fsId                 = "fs-abcd1234"
 		uid            int64 = 1001
 		gid            int64 = 1001
@@ -199,7 +199,7 @@ func TestCreateAccessPoint(t *testing.T) {
 
 func TestDeleteAccessPoint(t *testing.T) {
 	var (
-		accessPointId = "fsap-abcd1234xyz987"
+		accessPointId = "fsap-abcd1234"
 	)
 	testCases := []struct {
 		name     string
@@ -290,8 +290,8 @@ func TestDeleteAccessPoint(t *testing.T) {
 
 func TestDescribeAccessPoint(t *testing.T) {
 	var (
-		arn                  = "arn:aws:elasticfilesystem:us-east-1:1234567890:access-point/fsap-abcd1234xyz987"
-		accessPointId        = "fsap-abcd1234xyz987"
+		arn                  = "arn:aws:elasticfilesystem:us-east-1:1234567890:access-point/fsap-abcd1234"
+		accessPointId        = "fsap-abcd1234"
 		fsId                 = "fs-abcd1234"
 		uid            int64 = 1001
 		gid            int64 = 1001
@@ -670,7 +670,7 @@ func TestListAccessPoints(t *testing.T) {
 		fsId                = "fs-abcd1234"
 		accessPointId       = "ap-abc123"
 		Gid           int64 = 1000
-		Uid           int64 = 1000
+		Uid           int64 = 2000
 	)
 	testCases := []struct {
 		name     string
@@ -710,6 +710,17 @@ func TestListAccessPoints(t *testing.T) {
 
 				if len(res) != 1 {
 					t.Fatalf("Expected only one AccessPoint in response but got: %v", res)
+				}
+
+				// Verify PosixUser fields are correctly mapped
+				if res[0].PosixUser == nil {
+					t.Fatal("PosixUser should not be nil")
+				}
+				if res[0].PosixUser.Gid != Gid {
+					t.Fatalf("Gid mismatched. Expected: %v, Actual: %v", Gid, res[0].PosixUser.Gid)
+				}
+				if res[0].PosixUser.Uid != Uid {
+					t.Fatalf("Uid mismatched. Expected: %v, Actual: %v", Uid, res[0].PosixUser.Uid)
 				}
 
 				mockctl.Finish()
